@@ -1,0 +1,91 @@
+---
+title: "Getting Started with NestJS and Prisma"
+description: "A quick guide on how to set up a NestJS project with Prisma."
+---
+
+# Getting Started with NestJS and Prisma
+
+NestJS is a powerful framework for building scalable server-side applications. Prisma provides an ORM that makes database management seamless. In this guide, we'll walk through the setup of a NestJS project with Prisma.
+
+```
+<Alert type="info">
+  Before you start, make sure you have Node.js installed on your machine.
+</Alert>
+```
+
+## Step 1: Set Up a New NestJS Project
+
+First, you'll need to install the NestJS CLI and create a new project:
+
+```
+<CodeBlock language="bash">
+  npm i -g @nestjs/cli nest new my-nest-project
+</CodeBlock>
+```
+
+Navigate into your new project directory:
+
+```
+<CodeBlock language="bash">cd my-nest-project</CodeBlock>
+```
+
+## Step 2: Install Prisma
+
+Prisma can be easily integrated into a NestJS project. Begin by installing the necessary Prisma packages:
+
+```
+<CodeBlock language="bash">
+  npm install prisma --save-dev npm install @prisma/client
+</CodeBlock>
+```
+
+Next, initialize Prisma in your project:
+
+```
+<CodeBlock language="bash">npx prisma init</CodeBlock>
+```
+
+This will create a `prisma` directory with a `schema.prisma` file, which is where you'll define your database models.
+
+## Step 3: Configure Prisma with NestJS
+
+To configure Prisma in your NestJS application, create a new service that will handle all database interactions. Start by generating a new service:
+
+```
+<CodeBlock language="bash">nest g service prisma</CodeBlock>
+```
+
+Open the generated service file (`prisma.service.ts`) and set up Prisma as follows:
+
+```typescript
+import { Injectable, OnModuleInit, OnModuleDestroy } from "@nestjs/common";
+import { PrismaClient } from "@prisma/client";
+
+@Injectable()
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
+  async onModuleInit() {
+    await this.$connect();
+  }
+
+  async onModuleDestroy() {
+    await this.$disconnect();
+  }
+}
+```
+
+```
+import PostCard from './PostCard';
+
+<PostCard
+  title="Learning TypeScript"
+  summary="This post dives into the basics of TypeScript and how it can improve your JavaScript code."
+  image="https://via.placeholder.com/150"
+  author="John Doe"
+  publishedAt="2024-09-01"
+/>
+
+This is some additional content that can be included in the MDX file.
+```
