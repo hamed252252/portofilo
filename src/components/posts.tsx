@@ -1,5 +1,12 @@
 import Link from "next/link";
-import { PostmetaData } from "@/lib/posts";
+import { getPosts, PostmetaData } from "@/lib/posts";
+
+export async function generateStaticParams() {
+  const posts = await getPosts();
+  const slugs = posts.map((post) => ({ slug: post.slug }));
+  return slugs;
+}
+
 export default function Posts({ posts }: { posts: PostmetaData[] }) {
   return (
     <ul className="flex flex-col gap-8">
