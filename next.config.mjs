@@ -6,8 +6,20 @@ const nextConfig = withMDX({
     // You can add additional MDX options here if needed
   },
 })({
-  // Add your existing Next.js config options here
   pageExtensions: ["js", "jsx", "ts", "tsx", "md", "mdx"],
+  images: {
+    remotePatterns: [
+      {
+        hostname: "images.unsplash.com",
+      },
+    ],
+  },
 });
 
-export default nextConfig;
+// Corrected usage of withMDX
+const finalConfig = {
+  ...nextConfig,
+  // Other Next.js configurations can go here
+};
+
+export default finalConfig;
