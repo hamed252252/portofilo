@@ -5,10 +5,7 @@ export default function Header() {
     <header className="fixed inset-x-0 top-0 z-50 bg-background/75">
       <nav className="container mx-auto flex max-w-3xl items-center justify-between">
         <div>
-          <Link
-            href={"https://github.com/hamed252252/"}
-            className="font-serif text-2xl font-bold"
-          >
+          <Link href={"/"} className="font-serif text-2xl font-bold">
             HN
           </Link>
         </div>

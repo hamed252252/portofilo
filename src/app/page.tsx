@@ -11,10 +11,8 @@ export default function Home() {
       <div className="max-w-3x container">
         <h1 className="text-3xl font-bold"> Portofilo</h1>
       </div>
-      <div className="container">
+      <div className="container max-w-6xl">
         <Intro />
-      </div>
-      <div className="container">
         <RecentPosts />
       </div>
     </section>

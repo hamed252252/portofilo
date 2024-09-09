@@ -1,11 +1,13 @@
+"use server";
 import path from "path";
-import fs from "fs";
+import fs from "fs/promises"; // Using fs/promises for async file operations
 import matter from "gray-matter";
 
 export type Post = {
   metadata: PostmetaData;
   content: string;
 };
+
 export type PostmetaData = {
   title?: string;
   summary?: string;
@@ -16,43 +18,57 @@ export type PostmetaData = {
 };
 
 const rootDirectory = path.join(process.cwd(), "src", "content", "posts");
-export async function getPostBySlug(slug: string): Promise<Post | null> {
+
+async function readFileContent(filePath: string): Promise<string | null> {
   try {
-    const filePath = path.join(rootDirectory, `${slug}.mdx`);
-    console.log("Looking for file at:", filePath);
-    const fileContent = fs.readFileSync(filePath, { encoding: "utf-8" });
-    const { data, content } = matter(fileContent);
-    return { metadata: { ...data, slug }, content };
+    return await fs.readFile(filePath, { encoding: "utf-8" });
   } catch (error) {
-    console.error("Error reading file:", error);
+    console.error(`Error reading file at ${filePath}:`, error);
     return null;
   }
 }
-export async function getPosts(limit?: number): Promise<PostmetaData[]> {
-  const files = fs.readdirSync(rootDirectory);
 
-  const posts = files
-    .map((file) => getPostMetadata(file))
-    .sort((a, b) => {
-      if (new Date(a.publishedAt ?? "") < new Date(b.publishedAt ?? "")) {
-        return 1;
-      } else {
-        return -1;
-      }
-    });
+export async function getPostBySlug(slug: string): Promise<Post | null> {
+  const filePath = path.join(rootDirectory, `${slug}.mdx`);
+  console.log("Looking for file at:", filePath);
 
-  if (limit) {
-    return posts.slice(0, limit);
-  }
+  const fileContent = await readFileContent(filePath);
+  if (!fileContent) return null;
 
-  return posts;
+  const { data, content } = matter(fileContent);
+  return { metadata: { ...data, slug }, content };
 }
 
-export function getPostMetadata(filepath: string): PostmetaData {
+async function getAllFiles(): Promise<string[]> {
+  try {
+    return await fs.readdir(rootDirectory);
+  } catch (error) {
+    console.error("Error reading directory:", error);
+    return [];
+  }
+}
+
+export async function getPosts(limit?: number): Promise<PostmetaData[]> {
+  const files = await getAllFiles();
+
+  const posts = await Promise.all(files.map((file) => getPostMetadata(file)));
+
+  posts.sort(
+    (a, b) =>
+      new Date(b.publishedAt ?? "").getTime() -
+      new Date(a.publishedAt ?? "").getTime(),
+  );
+
+  return limit ? posts.slice(0, limit) : posts;
+}
+
+export async function getPostMetadata(filepath: string): Promise<PostmetaData> {
   const slug = filepath.replace(/\.mdx?$/, "");
   const filePath = path.join(rootDirectory, filepath);
-  const fileContent = fs.readFileSync(filePath, { encoding: "utf8" });
-  const { data } = matter(fileContent);
 
+  const fileContent = await readFileContent(filePath);
+  if (!fileContent) return { slug };
+
+  const { data } = matter(fileContent);
   return { ...data, slug };
 }
